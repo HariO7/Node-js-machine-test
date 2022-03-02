@@ -5,14 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="./views/main.css">
 </head>
 <body>
     <h1>Register</h1>
-    <form action="/register" method="post">
+    <form action="/register" method="post" class="form container">
         <label for="Name">Name:</label>
-        <input type="text" name="Name" placeholder="Name" required>
+        <input type="text" name="Name" placeholder="Name" required class="input">
         <label for="password">Password:</label>
-        <input type="password" name="Password" placeholder="Password" required>
+        <input type="password" name="Password" placeholder="Password" required class="input">
         <button>submit</button>
     </form>
     <a href="./login">login</a>

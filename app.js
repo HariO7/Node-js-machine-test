@@ -28,43 +28,37 @@ function collectRequestData(request, callback) {
   }
 }
 
-
-
 http
   .createServer(function (req, res) {
     console.log("request ", req.url);
 
     let url = "." + req.url;
+
     if (url == "./index") {
       url = "./index.html";
     }
+
     if (url == "./login") {
-        if(req.method == 'POST'){
-            collectRequestData(req,(result)=>{
-                const {Name, Password} = result
-                if(!(Name && Password)){
-                    res.status(404).send('all input should be filled')
-                }
-                const getUser = async()=>{
-                    const user = await User.findOne({Name})
-                    if(bcrypt.compareSync(Password,user.password)){
-                        console.log("ok");
-                        url = './index.html'
-                    }else{
-                        console.log('no');
-                    }
-                }
-                getUser()
-            })
-        }else{
-            url = "./login.html";
-        }
+      if (req.method == "POST") {
+        collectRequestData(req, (result) => {
+          const { Name, Password } = result;
+          if (!(Name && Password)) {
+            res.status(404).send("all input should be filled");
+          }
+          const getUser = async () => {
+            const user = await User.findOne({ Name });
+            if (bcrypt.compareSync(Password, user.password)) {
+              console.log("ok");
+            } else {
+              console.log("no");
+            }
+          };
+          getUser();
+        });
+      } else {
+        url = "./login.html";
+      }
     }
-
-
-
-
-
 
     if (url == "./register") {
       if (req.method === "POST") {
@@ -77,9 +71,9 @@ http
             });
             console.log(user);
             user.save();
-            res.statusCode=302;
-            url = './login.html'
-            return res.end()
+            res.statusCode = 302;
+            url = "./login.html";
+            return res.end();
           });
           //     res.statusCode=302;
           //   res.setHeader('location','/login')
@@ -93,30 +87,25 @@ http
       }
     }
 
-
-
-
-
-    if(url == './dashboard'){
-        getUser= async() =>{
-            const users = []
-            const user =await User.find()
-            for(obj in user ){
-                console.log(user[obj]['name']);
-                let data = user[obj]['name'];
-                users.push(`<h1>${data}</h1>`)
-                fs.writeFileSync('./dashboard.html',`${data}`)
-            }
-            // const data = 
-            // fs.writeFileSync('dashboard.html',user)
-            //         res.write('<html>');
-            //    res.write('<head> <title> Hello TutorialsPoint </title> </head>');
-            //    res.write(' <body> <h1>Hello</h1> users</body>');
-            //    res.write('</html>');
-                    // res.end()
+    if (url == "./dashboard") {
+      getUser = async () => {
+        const users = [];
+        const user = await User.find();
+        for (obj in user) {
+          console.log(user[obj]["name"]);
+          let data = user[obj]["name"];
+          users.push(`<h1>${data}</h1>`);
+          fs.writeFileSync("./dashboard.html", `${data}`);
         }
-        getUser()
-        url = './dashboard.html'
+        // const data =
+        // fs.writeFileSync('dashboard.html',user)
+        //         res.write('<html>');
+        //    res.write('<head> <title> Hello TutorialsPoint </title> </head>');
+        //    res.write(' <body> <h1>Hello</h1> users</body>');
+        //    res.write('</html>');
+        // res.end()
+      };
+      getUser()
     }
 
     const extname = String(path.extname(url)).toLowerCase();
