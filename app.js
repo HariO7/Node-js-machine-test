@@ -12,6 +12,9 @@ http.createServer(function (request, response) {
     if(filePath == './login'){
         filePath = './login.html';
     }
+    if(filePath == './register'){
+        filePath = './register.html'
+    }
 
     const  extname = String(path.extname(filePath)).toLowerCase();
     const mimeTypes = {
