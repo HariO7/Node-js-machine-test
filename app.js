@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const User = require("./models/user");
 const { parse } = require("querystring");
 const bcrypt = require("bcrypt");
+const { appendFile } = require("fs/promises");
 
 mongoose.connect(process.env.DATABASE_URL, () => {
   console.log("connected to database");
@@ -26,6 +27,8 @@ function collectRequestData(request, callback) {
     callback(null);
   }
 }
+
+
 
 http
   .createServer(function (req, res) {
@@ -58,6 +61,11 @@ http
         }
     }
 
+
+
+
+
+
     if (url == "./register") {
       if (req.method === "POST") {
         collectRequestData(req, (result) => {
@@ -83,6 +91,32 @@ http
       } else {
         url = "./register.html";
       }
+    }
+
+
+
+
+
+    if(url == './dashboard'){
+        getUser= async() =>{
+            const users = []
+            const user =await User.find()
+            for(obj in user ){
+                console.log(user[obj]['name']);
+                let data = user[obj]['name'];
+                users.push(`<h1>${data}</h1>`)
+                fs.writeFileSync('./dashboard.html',`${data}`)
+            }
+            // const data = 
+            // fs.writeFileSync('dashboard.html',user)
+            //         res.write('<html>');
+            //    res.write('<head> <title> Hello TutorialsPoint </title> </head>');
+            //    res.write(' <body> <h1>Hello</h1> users</body>');
+            //    res.write('</html>');
+                    // res.end()
+        }
+        getUser()
+        url = './dashboard.html'
     }
 
     const extname = String(path.extname(url)).toLowerCase();
