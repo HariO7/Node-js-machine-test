@@ -6,6 +6,7 @@ const path = require("path");
 const mongoose = require("mongoose");
 const User = require("./models/user");
 const { parse } = require("querystring");
+const bcrypt = require("bcrypt");
 
 mongoose.connect(process.env.DATABASE_URL, () => {
   console.log("connected to database");
@@ -34,31 +35,56 @@ http
     if (url == "./index") {
       url = "./index.html";
     }
-   
+    if (url == "./login") {
+        if(req.method == 'POST'){
+            collectRequestData(req,(result)=>{
+                const {Name, Password} = result
+                if(!(Name && Password)){
+                    res.status(404).send('all input should be filled')
+                }
+                const getUser = async()=>{
+                    const user = await User.findOne({Name})
+                    if(bcrypt.compareSync(Password,user.password)){
+                        console.log("ok");
+                        url = './index.html'
+                    }else{
+                        console.log('no');
+                    }
+                }
+                getUser()
+            })
+        }else{
+            url = "./login.html";
+        }
+    }
+
     if (url == "./register") {
       if (req.method === "POST") {
         collectRequestData(req, (result) => {
-        //   const user = new User({
-        //     name: result.Name,
-        //     password: result.Password,
-        //   });
-        //   console.log(user);
-        //   user.save();
+          const password = result.Password;
+          bcrypt.hash(password, 10, function (err, hash) {
+            const user = new User({
+              name: result.Name,
+              password: hash,
+            });
+            console.log(user);
+            user.save();
             res.statusCode=302;
-          res.setHeader('location','/login')
-        //   res.writeHead(301,{Location: 'http://3000/login'})
-        url = './login.html';
-        console.log(url);
-          return res.end();
-
+            url = './login.html'
+            return res.end()
+          });
+          //     res.statusCode=302;
+          //   res.setHeader('location','/login')
+          //   res.writeHead(301,{Location: 'http://3000/login'})
+          // url = './login.html';
+          // console.log(url);
+          //   return res.end();
         });
       } else {
         url = "./register.html";
       }
     }
-    if (url == "./login") {
-        url = "./login.html";
-      }
+
     const extname = String(path.extname(url)).toLowerCase();
     const mimeTypes = {
       ".html": "text/html",
